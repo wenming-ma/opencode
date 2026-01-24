@@ -27,7 +27,12 @@ const ChatCompletionRequest = z.object({
     presence_penalty: z.number().optional(),
     frequency_penalty: z.number().optional(),
     user: z.string().optional(),
-})
+    // Tool calling support
+    tools: z.array(z.any()).optional(),
+    tool_choice: z.any().optional(),
+    // Streaming options
+    stream_options: z.any().optional(),
+}).passthrough()
 
 type ChatCompletionRequest = z.infer<typeof ChatCompletionRequest>
 
@@ -114,7 +119,13 @@ export const OpenAICompatRoute = new Hono()
         }
 
         const request = parsed.data
-        log.info("chat completion request", { model: request.model, stream: request.stream })
+        log.info("chat completion request", {
+            model: request.model,
+            stream: request.stream,
+            messageCount: request.messages.length,
+            hasTools: !!request.tools?.length,
+            toolCount: request.tools?.length ?? 0,
+        })
 
         // Parse model ID (format: provider/model)
         const { providerID, modelID } = Provider.parseModel(request.model)
