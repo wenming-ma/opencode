@@ -58,7 +58,21 @@ function generateId(): string {
     return "chatcmpl-" + Math.random().toString(36).substring(2, 15)
 }
 
+// Get the chat HTML file path
+const CHAT_HTML_PATH = new URL("./chat.html", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1")
+
 export const OpenAICompatRoute = new Hono()
+    // Chat UI - serves the HTML chat interface
+    .get("/chat", async (c) => {
+        try {
+            const html = await Bun.file(CHAT_HTML_PATH).text()
+            return c.html(html)
+        } catch (e) {
+            log.error("Failed to load chat.html", { error: e })
+            return c.text("Chat interface not found", 404)
+        }
+    })
+
     // List models endpoint
     .get("/v1/models", async (c) => {
         log.info("listing models")
