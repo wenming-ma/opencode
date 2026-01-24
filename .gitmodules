@@ -1,0 +1,3 @@
+[submodule "Antigravity-Manager"]
+	path = Antigravity-Manager
+	url = https://github.com/wenming-ma/Antigravity-Manager.git
